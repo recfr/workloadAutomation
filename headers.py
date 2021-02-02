@@ -1,4 +1,7 @@
 class Headers:
+    # define temp headers
+    tempRMLS = 'daysDiff_RMLS'
+    tempTermin = 'daysDiff_Termin'
     # define headers
     rmls = 'SollRückmeldetermin Leitstand'      # dd.mm.YYYY
     kTermin = 'Konstruktionstermin Soll'        # dd.mm.YYYY
