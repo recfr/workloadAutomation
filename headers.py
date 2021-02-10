@@ -14,6 +14,3 @@ class Headers:
     pivotTableItem1 = 'Gecikme Nedeni'
     pivotTableItem2 = 'Alınacak Aksiyon'
     pivotTableItem3 = 'Çalışma Tipi'
-
-
-
