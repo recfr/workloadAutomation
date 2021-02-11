@@ -22,11 +22,11 @@ def cleanByDate(sheetName, _tempRMLS, _tempTermin):
 
     elif dayName == 'Wednesday' or dayName == 'Thursday' or dayName == 'Friday':
         for row in sheetName[_tempRMLS]:
-            if row != None and row > 5:
+            if row != None and row > 4:
                 rowIndex = next(iter(sheetName[sheetName[_tempRMLS] == row].index), 'no match')
                 sheetName.drop(rowIndex, inplace=True)
         for row in sheetName[_tempTermin]:
-            if row != None and row > 5:
+            if row != None and row > 4:
                 rowIndex = next(iter(sheetName[sheetName[_tempTermin] == row].index), 'no match')
                 sheetName.drop(rowIndex, inplace=True)
 
@@ -37,11 +37,11 @@ def cleanByDate(sheetName, _tempRMLS, _tempTermin):
 def timeDiff(sheetName, dateRMLS, dateTermin):
     # TODO into the real life app will use to today instead of testDay.
     # time_format = '%Y-%m-%d'
-    # today = datetime.date.today()
-    testDay = datetime.datetime.strptime('2021-01-27', '%Y-%m-%d')
-    daysDiff_Termin = df[dateTermin] - testDay
+    # today = datetime.datetime.now()
+    # testDay = datetime.datetime.strptime('2021-01-27', '%Y-%m-%d')
+    daysDiff_Termin = df[dateTermin] - datetime.datetime.now()
     sheetName.insert(0, headerObj.tempTermin, daysDiff_Termin.dt.days)
-    daysDiff_RMLS = df[dateRMLS] - testDay
+    daysDiff_RMLS = df[dateRMLS] - datetime.datetime.now()
     sheetName.insert(0, headerObj.tempRMLS, daysDiff_RMLS.dt.days)
 
 
@@ -54,7 +54,7 @@ def rowCleaner_KEM(sheetName, columnName):
 
 def combineColumns(sheetName, firstColumn, secondColumn, position):
     # Combine documentStatus and orderPhase
-    combinedColumn = sheetName[firstColumn] + "/" + sheetName[secondColumn]
+    combinedColumn = sheetName[firstColumn].apply(str) + "/" + sheetName[secondColumn]
     sheetName.insert(position, headerObj.combinedColumns, combinedColumn)
     del sheetName[firstColumn]
     del sheetName[secondColumn]
@@ -90,7 +90,7 @@ def rowMark_GEL(sheetName, columnName):
 
 def rowMark_HKB(sheetName, columnName):
     for row in sheetName[columnName]:
-        if row[:3] == "HKB" or row[:3] == "GEN" or row[:3] == "KAT" or row[:3] == 'CO_':
+        if row[:3] == "HKB" or row[:3] == "GEN" or row[:3] == "KAT" or row[:3] == 'CO_' or row[:3] == 'SU_':
             rowIndex = next(iter(sheetName[sheetName[columnName] == row].index), 'no match')
             sheetName.loc[rowIndex, headerObj.pivotTableItem3] = 'RMLS'
 
@@ -128,7 +128,7 @@ def workingDays(sheetName, dateRMLS, dateTermin):
 
 def rowMark_Fehler(sheetName, columnName):
     for row in sheetName[columnName]:
-        if len(row) > 12:
+        if len(row) > 12 and row[:2] == 'ME':
             rowIndex = next(iter(sheetName[sheetName[columnName] == row].index), 'no match')
             sheetName.loc[rowIndex, headerObj.pivotTableItem1] = 'Bugün Çalışılacak'
             sheetName.loc[rowIndex, headerObj.pivotTableItem2] = 'Bugün Çalışılacak'
@@ -136,7 +136,7 @@ def rowMark_Fehler(sheetName, columnName):
 
 
 # read excel file
-dailyWorkload = 'dailyworkload2.xlsx'
+dailyWorkload = 'dailyworkload.xlsx'
 df = pd.read_excel(dailyWorkload, sheet_name='Sheet1')
 
 addPivotTableHeaders()
@@ -166,3 +166,4 @@ writer = pd.ExcelWriter("edited_Workload.xlsx",
                         datetime_format='dd.mm.yyyy', )
 df.to_excel(writer, 'Sheet1', index=False)
 writer.save()
+
