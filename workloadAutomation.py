@@ -35,7 +35,6 @@ def cleanByDate(sheetName, _tempRMLS, _tempTermin):
 
 
 def timeDiff(sheetName, dateRMLS, dateTermin):
-    # TODO into the real life app will use to today instead of testDay.
     # time_format = '%Y-%m-%d'
     # today = datetime.datetime.now()
     # testDay = datetime.datetime.strptime('2021-01-27', '%Y-%m-%d')
@@ -95,6 +94,13 @@ def rowMark_HKB(sheetName, columnName):
             sheetName.loc[rowIndex, headerObj.pivotTableItem3] = 'RMLS'
 
 
+def rowMark_Mitteilung(sheetName, columnName):
+    for row in sheetName[columnName]:
+        if len(row) == 12 and row[:2] == "ME":
+            rowIndex = next(iter(sheetName[sheetName[columnName] == row].index), 'no match')
+            sheetName.loc[rowIndex, headerObj.pivotTableItem3] = 'Bildiri'
+
+
 def splitStatus(sheetName, combinedDocStatus, _docStatus, _orderPhase, pos1, pos2):
     status_list = []
     phases_list = []
@@ -120,6 +126,8 @@ def workingDays(sheetName, dateRMLS, dateTermin):
     sheetName['combinedDays'] = sheetName['combinedDays'].replace('Wednesday', 'Çarşamba Çalışılacak')
     sheetName['combinedDays'] = sheetName['combinedDays'].replace('Thursday', 'Perşembe Çalışılacak')
     sheetName['combinedDays'] = sheetName['combinedDays'].replace('Friday', 'Cuma Çalışılacak')
+    sheetName['combinedDays'] = sheetName['combinedDays'].replace('Saturday', 'Cuma Çalışılacak')
+    sheetName['combinedDays'] = sheetName['combinedDays'].replace('Sunday', 'Cuma Çalışılacak')
 
     sheetName[headerObj.pivotTableItem1] = sheetName['combinedDays']
     sheetName[headerObj.pivotTableItem2] = sheetName['combinedDays']
@@ -148,22 +156,15 @@ rowCleaner_docStatus(df, headerObj.combinedColumns)
 cleanBy_BBnummer(df, headerObj.bbNummer)
 rowMark_GEL(df, headerObj.docType)
 rowMark_HKB(df, headerObj.docType)
+rowMark_Mitteilung(df, headerObj.docType)
 workingDays(df, headerObj.rmls, headerObj.kTermin)
 rowMark_Fehler(df, headerObj.docType)
 splitStatus(df, headerObj.combinedColumns, headerObj.docStatus, headerObj.orderPhase, 5, 6)
 
-# for row in df[headerObj.combinedColumns]:
-#     if str(row) == "47/T" or str(row) == "47/E":
-#         rowIndex = next(iter(df[df[headerObj.combinedColumns] == row].index), 'no match')
-#         df.loc[rowIndex, headerObj.pivotTableItem1] = "47'de"
-#         df.loc[rowIndex, headerObj.pivotTableItem2] = "47'de"
-#         df.loc[rowIndex, headerObj.pivotTableItem3] = "47'de"
-
+# TODO docStatus 47 should mark
 
 # write output file
-writer = pd.ExcelWriter("edited_Workload.xlsx",
-                        engine='xlsxwriter',
-                        datetime_format='dd.mm.yyyy', )
+writer = pd.ExcelWriter("edited_Workload.xlsx", engine='xlsxwriter', datetime_format='dd.mm.yyyy')
 df.to_excel(writer, 'Sheet1', index=False)
 writer.save()
 
