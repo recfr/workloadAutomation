@@ -164,7 +164,8 @@ splitStatus(df, headerObj.combinedColumns, headerObj.docStatus, headerObj.orderP
 # TODO docStatus 47 should mark
 
 # write output file
-writer = pd.ExcelWriter("edited_Workload.xlsx", engine='xlsxwriter', datetime_format='dd.mm.yyyy')
+tempNameData = datetime.date.today().strftime('%d-%m-%Y')
+fileNameData = "~/desktop/" +tempNameData +"_Workload.xlsx"
+writer = pd.ExcelWriter(fileNameData, engine='xlsxwriter', datetime_format='dd.mm.yyyy')
 df.to_excel(writer, 'Sheet1', index=False)
 writer.save()
-
