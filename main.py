@@ -96,6 +96,7 @@ class Ui_MainWindow(object):
         msg = QMessageBox()
         msg.setWindowTitle("Information")
         msg.setText(f'Workload list \n{created_fileName} \n created.')
+        msg.setIcon(QMessageBox.Information)
         self.executeButton.setEnabled(False)
         x = msg.exec_()
 
