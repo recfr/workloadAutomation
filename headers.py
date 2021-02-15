@@ -1,17 +1,141 @@
+from datetime import datetime
+import datetime
+
 class Headers:
 
-    # define temp headers
-    tempRMLS = 'daysDiff_RMLS'
-    tempTermin = 'daysDiff_Termin'
-    combinedColumns = 'Document Status'  # Combined docStatus & orderPhase
+    def __init__(self):
+        # define temp headers
+        self.tempRMLS = 'daysDiff_RMLS'
+        self.tempTermin = 'daysDiff_Termin'
+        self.combinedColumns = 'Document Status'  # Combined docStatus & orderPhase
 
-    # define headers
-    rmls = 'SollRückmeldetermin Leitstand'  # dd.mm.YYYY
-    kTermin = 'Konstruktionstermin Soll'  # dd.mm.YYYY
-    docType = 'Dokument'  # clean WAR,EBS & write HKB, GEN, GEL ; SU_?, CO_?
-    bbNummer = 'BB-Nummer'
-    docStatus = 'Dokumentstatus'  # 46, 47, 42, FG
-    orderPhase = 'Auftragsphase'  # E, T
-    pivotTableItem1 = 'Gecikme Nedeni'
-    pivotTableItem2 = 'Alınacak Aksiyon'
-    pivotTableItem3 = 'Çalışma Tipi'
+        # define headers
+        self.rmls = 'SollRückmeldetermin Leitstand'  # dd.mm.YYYY
+        self.kTermin = 'Konstruktionstermin Soll'  # dd.mm.YYYY
+        self.docType = 'Dokument'  # clean WAR,EBS & write HKB, GEN, GEL ; SU_?, CO_?
+        self.bbNummer = 'BB-Nummer'
+        self.docStatus = 'Dokumentstatus'  # 46, 47, 42, FG
+        self.orderPhase = 'Auftragsphase'  # E, T
+        self.pivotTableItem1 = 'Gecikme Nedeni'
+        self.pivotTableItem2 = 'Alınacak Aksiyon'
+        self.pivotTableItem3 = 'Çalışma Tipi'
+
+    def addPivotTableHeaders(self, sheetName):
+        sheetName[self.pivotTableItem1] = " "
+        sheetName[self.pivotTableItem2] = " "
+        sheetName[self.pivotTableItem3] = " "
+
+    def timeDiff(self, sheetName):
+        daysDiff_Termin = sheetName[self.kTermin] - datetime.datetime.now()
+        sheetName.insert(0, self.tempTermin, daysDiff_Termin.dt.days)
+        daysDiff_RMLS = sheetName[self.rmls] - datetime.datetime.now()
+        sheetName.insert(0, self.tempRMLS, daysDiff_RMLS.dt.days)
+
+    def cleanByDate(self, sheetName):
+        dayName = datetime.date.today().strftime('%A')
+
+        if dayName == 'Monday' or dayName == 'Tuesday':
+            for row in sheetName[self.tempRMLS]:
+                if row != None and row > 3:
+                    rowIndex = next(iter(sheetName[sheetName[self.tempRMLS] == row].index), 'no match')
+                    sheetName.drop(rowIndex, inplace=True)
+            for row in sheetName[self.tempTermin]:
+                if row != None and row > 3:
+                    rowIndex = next(iter(sheetName[sheetName[self.tempTermin] == row].index), 'no match')
+                    sheetName.drop(rowIndex, inplace=True)
+
+        elif dayName == 'Wednesday' or dayName == 'Thursday' or dayName == 'Friday':
+            for row in sheetName[self.tempRMLS]:
+                if row != None and row > 4:
+                    rowIndex = next(iter(sheetName[sheetName[self.tempRMLS] == row].index), 'no match')
+                    sheetName.drop(rowIndex, inplace=True)
+            for row in sheetName[self.tempTermin]:
+                if row != None and row > 4:
+                    rowIndex = next(iter(sheetName[sheetName[self.tempTermin] == row].index), 'no match')
+                    sheetName.drop(rowIndex, inplace=True)
+
+        del sheetName[self.tempRMLS]
+        del sheetName[self.tempTermin]
+
+    def rowCleaner_KEM(self, sheetName):
+        for row in sheetName[self.docType]:
+            if row[:3] == "WAR" or row[:3] == "EBS":
+                rowIndex = next(iter(sheetName[sheetName[self.docType] == row].index), 'no match')
+                sheetName.drop(rowIndex, inplace=True)
+
+    def combineColumns(self, sheetName):
+        # Combine documentStatus and orderPhase
+        combinedColumn = sheetName[self.docStatus].apply(str) + "/" + sheetName[self.orderPhase]
+        sheetName.insert(5, self.combinedColumns, combinedColumn)
+        del sheetName[self.docStatus]
+        del sheetName[self.orderPhase]
+
+    def rowCleaner_docStatus(self, sheetName):
+        for row in sheetName[self.combinedColumns]:
+            if str(row) == "46/T":
+                rowIndex = next(iter(sheetName[sheetName[self.combinedColumns] == row].index), 'no match')
+                sheetName.drop(rowIndex, inplace=True)
+
+    def cleanBy_BBnummer(self, sheetName):
+        sheetName[self.bbNummer] = sheetName[self.bbNummer].fillna('-')
+        for row in sheetName[self.bbNummer]:
+            if row == '-':
+                rowIndex = next(iter(sheetName[sheetName[self.bbNummer] == row].index), 'no match')
+                sheetName.drop(rowIndex, inplace=True)
+
+    def rowMark_GEL(self, sheetName):
+        for row in sheetName[self.docType]:
+            if row[:3] == "GEL":
+                rowIndex = next(iter(sheetName[sheetName[self.docType] == row].index), 'no match')
+                sheetName.loc[rowIndex, self.pivotTableItem3] = 'AKT'
+
+    def rowMark_HKB(self, sheetName):
+        for row in sheetName[self.docType]:
+            if row[:3] == "HKB" or row[:3] == "GEN" or row[:3] == "KAT" or row[:3] == 'CO_' or row[:3] == 'SU_':
+                rowIndex = next(iter(sheetName[sheetName[self.docType] == row].index), 'no match')
+                sheetName.loc[rowIndex, self.pivotTableItem3] = 'RMLS'
+
+    def rowMark_Mitteilung(self, sheetName):
+        for row in sheetName[self.docType]:
+            if len(row) == 12 and row[:2] == "ME":
+                rowIndex = next(iter(sheetName[sheetName[self.docType] == row].index), 'no match')
+                sheetName.loc[rowIndex, self.pivotTableItem3] = 'Bildiri'
+
+    def workingDays(self, sheetName):
+        weekdays_rmls_list = sheetName[self.rmls].dt.day_name()
+        weekdays_termin_list = sheetName[self.kTermin].dt.day_name()
+        sheetName['combinedDays'] = weekdays_termin_list.fillna('') + weekdays_rmls_list.fillna('')
+
+        sheetName['combinedDays'] = sheetName['combinedDays'].replace('Monday', 'Pazartesi Çalışılacak')
+        sheetName['combinedDays'] = sheetName['combinedDays'].replace('Tuesday', 'Salı Çalışılacak')
+        sheetName['combinedDays'] = sheetName['combinedDays'].replace('Wednesday', 'Çarşamba Çalışılacak')
+        sheetName['combinedDays'] = sheetName['combinedDays'].replace('Thursday', 'Perşembe Çalışılacak')
+        sheetName['combinedDays'] = sheetName['combinedDays'].replace('Friday', 'Cuma Çalışılacak')
+        sheetName['combinedDays'] = sheetName['combinedDays'].replace('Saturday', 'Cuma Çalışılacak')
+        sheetName['combinedDays'] = sheetName['combinedDays'].replace('Sunday', 'Cuma Çalışılacak')
+
+        sheetName[self.pivotTableItem1] = sheetName['combinedDays']
+        sheetName[self.pivotTableItem2] = sheetName['combinedDays']
+        del sheetName['combinedDays']
+
+    def rowMark_Fehler(self, sheetName):
+        for row in sheetName[self.docType]:
+            if len(row) > 12 and row[:2] == 'ME':
+                rowIndex = next(iter(sheetName[sheetName[self.docType] == row].index), 'no match')
+                sheetName.loc[rowIndex, self.pivotTableItem1] = 'Bugün Çalışılacak'
+                sheetName.loc[rowIndex, self.pivotTableItem2] = 'Bugün Çalışılacak'
+                sheetName.loc[rowIndex, self.pivotTableItem3] = 'Fehler'
+
+    def splitStatus(self, sheetName):
+        status_list = []
+        phases_list = []
+        excel_status = sheetName[self.combinedColumns]
+
+        for status in excel_status:
+            status, phases = status.split('/', 1)
+            status_list.append(status)
+            phases_list.append(phases)
+
+        sheetName.insert(5, self.docStatus, status_list)
+        sheetName.insert(6, self.orderPhase, phases_list)
+        del sheetName[self.combinedColumns]
