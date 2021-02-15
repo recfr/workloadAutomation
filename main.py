@@ -95,7 +95,7 @@ class Ui_MainWindow(object):
     def show_popUp(self, created_fileName):
         msg = QMessageBox()
         msg.setWindowTitle("Information")
-        msg.setText(f'Workload list \n{created_fileName} \n created.')
+        msg.setText(f'Workload list created \n{created_fileName}')
         msg.setIcon(QMessageBox.Information)
         self.executeButton.setEnabled(False)
         x = msg.exec_()
