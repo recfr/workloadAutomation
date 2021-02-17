@@ -76,18 +76,18 @@ class Ui_MainWindow(object):
         self.executeButton.clicked.connect(self.executeButton_handler)
 
     def cancelButton_handler(self):
-        print("cancelButton_handler")
         sys.exit(app.exec_())
 
     def browseButton_handler(self):
-        print("browseButton_handler")
         self.openDialogBox()
 
     def executeButton_handler(self):
         self.executeExcel()
 
     def openDialogBox(self):
-        self.path = QFileDialog.getOpenFileName()
+        path = "C:\\"
+        filter = "Excel file (*.xlsx)"
+        self.path = QFileDialog.getOpenFileName(QFileDialog(), "Select file", path, filter)
         self.textBrowser.setPlainText(self.path[0])
         if self.path[0] != None and self.path[0] != "":
             self.executeButton.setEnabled(True)
@@ -105,7 +105,7 @@ class Ui_MainWindow(object):
         msg.setWindowTitle("Warning")
         msg.setText("The input excel file is not compatible.")
         msg.setIcon(QMessageBox.Warning)
-        msg.setDetailedText("Columns' order must be as follows. Please check your SAP export."
+        msg.setDetailedText("Columns' order must be as follows. Please check your exported excel file from SAP."
                             "\n\nSollRückmeldetermin Leitstand"
                             "\nKonstruktionstermin Soll"
                             "\nDokument"
@@ -120,7 +120,6 @@ class Ui_MainWindow(object):
         x = msg.exec_()
 
     def executeExcel(self):
-        print("executeButton_handler")
         correctHeaderSet = ['SollRückmeldetermin Leitstand', 'Konstruktionstermin Soll', 'Dokument',
                                  'Beschreibung', 'BB-Nummer', 'Dokumentstatus', 'Auftragsphase',
                                  'BB Beschreibung', 'KSW-Status', 'Dokumentennummer Maßnahme',
