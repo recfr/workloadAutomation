@@ -63,7 +63,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MBT Workload Automation"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "MBT Workload Automation v1.0"))
         self.label.setText(_translate("MainWindow", "File Path"))
         self.cancelButton.setText(_translate("MainWindow", "Cancel"))
         self.executeButton.setText(_translate("MainWindow", "Execute"))
@@ -100,33 +100,64 @@ class Ui_MainWindow(object):
         self.executeButton.setEnabled(False)
         x = msg.exec_()
 
+    def warn_popUp(self):
+        msg = QMessageBox()
+        msg.setWindowTitle("Warning")
+        msg.setText("The input excel file is not compatible.")
+        msg.setIcon(QMessageBox.Warning)
+        msg.setDetailedText("Columns' order must be as follows. Please check your SAP export."
+                            "\n\nSollRückmeldetermin Leitstand"
+                            "\nKonstruktionstermin Soll"
+                            "\nDokument"
+                            "\nBeschreibung"
+                            "\nBB-Nummer"
+                            "\nDokumentstatus"
+                            "\nAuftragsphase"
+                            "\nBB Beschreibung"
+                            "\nKSW-Status"
+                            "\nDokumentennummer Maßnahme"
+                            "\nSachbearbeiter")
+        x = msg.exec_()
+
     def executeExcel(self):
         print("executeButton_handler")
+        correctHeaderSet = ['SollRückmeldetermin Leitstand', 'Konstruktionstermin Soll', 'Dokument',
+                                 'Beschreibung', 'BB-Nummer', 'Dokumentstatus', 'Auftragsphase',
+                                 'BB Beschreibung', 'KSW-Status', 'Dokumentennummer Maßnahme',
+                                 'Sachbearbeiter']
+
         dailyWorkload: str = self.path[0]
         workBook = pd.read_excel(dailyWorkload, sheet_name='Sheet1')
 
-        self.headersObject.addPivotTableHeaders(workBook)
-        self.headersObject.timeDiff(workBook)
-        self.headersObject.cleanByDate(workBook)
-        self.headersObject.rowCleaner_KEM(workBook)
-        self.headersObject.combineColumns(workBook)
-        self.headersObject.rowCleaner_docStatus(workBook)
-        self.headersObject.cleanBy_BBnummer(workBook)
-        self.headersObject.rowMark_GEL(workBook)
-        self.headersObject.rowMark_HKB(workBook)
-        self.headersObject.rowMark_Mitteilung(workBook)
-        self.headersObject.workingDays(workBook)
-        self.headersObject.rowMark_Fehler(workBook)
-        self.headersObject.splitStatus(workBook)
-        self.headersObject.rowMark_Status47(workBook)
+        ps1 = pd.Series(correctHeaderSet)
+        ps2 = pd.Series(workBook.columns.values)
+        isTrue = ps1.equals(other=ps2)
 
-        # write output file
-        tempNameData = datetime.date.today().strftime('%d-%m-%Y')
-        fileNameData = "~/desktop/" + tempNameData + "_Workload.xlsx"
-        writer = pd.ExcelWriter(fileNameData, engine='xlsxwriter', datetime_format='dd.mm.yyyy')
-        workBook.to_excel(writer, 'Sheet1', index=False)
-        writer.save()
-        self.show_popUp(fileNameData[1:])
+        if isTrue:
+            self.headersObject.addPivotTableHeaders(workBook)
+            self.headersObject.timeDiff(workBook)
+            self.headersObject.cleanByDate(workBook)
+            self.headersObject.rowCleaner_KEM(workBook)
+            self.headersObject.combineColumns(workBook)
+            self.headersObject.rowCleaner_docStatus(workBook)
+            self.headersObject.cleanBy_BBnummer(workBook)
+            self.headersObject.rowMark_GEL(workBook)
+            self.headersObject.rowMark_HKB(workBook)
+            self.headersObject.rowMark_Mitteilung(workBook)
+            self.headersObject.workingDays(workBook)
+            self.headersObject.rowMark_Fehler(workBook)
+            self.headersObject.splitStatus(workBook)
+            self.headersObject.rowMark_Status47(workBook)
+
+            # write output file
+            tempNameData = datetime.date.today().strftime('%d-%m-%Y')
+            fileNameData = "~/desktop/" + tempNameData + "_Workload.xlsx"
+            writer = pd.ExcelWriter(fileNameData, engine='xlsxwriter', datetime_format='dd.mm.yyyy')
+            workBook.to_excel(writer, 'Sheet1', index=False)
+            writer.save()
+            self.show_popUp(fileNameData[1:])
+        else:
+            self.warn_popUp()
 
 
 if __name__ == "__main__":
