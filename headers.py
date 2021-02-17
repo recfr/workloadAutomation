@@ -96,10 +96,9 @@ class Headers:
                 sheetName.loc[rowIndex, self.pivotTableItem3] = 'RMLS'
 
     def rowMark_Mitteilung(self, sheetName):
-        for row in sheetName[self.docType]:
-            if len(row) == 12 and row[:2] == "ME":
-                rowIndex = next(iter(sheetName[sheetName[self.docType] == row].index), 'no match')
-                sheetName.loc[rowIndex, self.pivotTableItem3] = 'Bildiri'
+        for index, value in sheetName[self.docType].items():
+            if value[:2] == "ME" and len(value) == 12:
+                sheetName.loc[index, self.pivotTableItem3] = 'Bildiri'
 
     def workingDays(self, sheetName):
         weekdays_rmls_list = sheetName[self.rmls].dt.day_name()
