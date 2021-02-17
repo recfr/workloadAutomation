@@ -129,9 +129,9 @@ class Ui_MainWindow(object):
         dailyWorkload: str = self.path[0]
         workBook = pd.read_excel(dailyWorkload, sheet_name='Sheet1')
 
-        ps1 = pd.Series(correctHeaderSet)
-        ps2 = pd.Series(workBook.columns.values)
-        isTrue = ps1.equals(other=ps2)
+        pSeries1 = pd.Series(correctHeaderSet)
+        pSeries2 = pd.Series(workBook.columns.values)
+        isTrue = pSeries1.equals(other=pSeries2)
 
         if isTrue:
             self.headersObject.addPivotTableHeaders(workBook)
