@@ -138,4 +138,12 @@ class Headers:
 
         sheetName.insert(5, self.docStatus, status_list)
         sheetName.insert(6, self.orderPhase, phases_list)
+
+    def rowMark_Status47(self, sheetName):
+        for index, value in sheetName[self.docStatus].items():
+            # print(f"Index : {index}, Value : {value}")
+            if value == "47":
+                sheetName.loc[index, self.pivotTableItem1] = f"{value}'de"
+                sheetName.loc[index, self.pivotTableItem2] = f"{value}'de"
+                sheetName.loc[index, self.pivotTableItem3] = f"{value}'de"
         del sheetName[self.combinedColumns]

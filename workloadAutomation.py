@@ -8,13 +8,13 @@ import xlrd
 import openpyxl
 import xlsxwriter
 
+
 class Ui_MainWindow(object):
 
     def __init__(self):
         self.headersObject = headers.Headers()
 
     def setupUi(self, MainWindow):
-
         MainWindow.setObjectName("MainWindow")
         MainWindow.setFixedSize(405, 100)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -40,7 +40,7 @@ class Ui_MainWindow(object):
         self.executeButton.setEnabled(False)
 
         self.browseButton = QtWidgets.QPushButton(self.centralwidget)
-        self.browseButton.setGeometry(QtCore.QRect(320, 8, 75, 23))
+        self.browseButton.setGeometry(QtCore.QRect(320, 8, 75, 21))
         self.browseButton.setObjectName("browseButton")
 
         MainWindow.setCentralWidget(self.centralwidget)
@@ -89,13 +89,13 @@ class Ui_MainWindow(object):
     def openDialogBox(self):
         self.path = QFileDialog.getOpenFileName()
         self.textBrowser.setPlainText(self.path[0])
-        if self.path[0] is not None and self.path[0] != "":
+        if self.path[0] != None and self.path[0] != "":
             self.executeButton.setEnabled(True)
 
     def show_popUp(self, created_fileName):
         msg = QMessageBox()
         msg.setWindowTitle("Information")
-        msg.setText(f'Workload list created \n{created_fileName}')
+        msg.setText(f'Workload list created. \n{created_fileName}')
         msg.setIcon(QMessageBox.Information)
         self.executeButton.setEnabled(False)
         x = msg.exec_()
@@ -118,9 +118,9 @@ class Ui_MainWindow(object):
         self.headersObject.workingDays(workBook)
         self.headersObject.rowMark_Fehler(workBook)
         self.headersObject.splitStatus(workBook)
+        self.headersObject.rowMark_Status47(workBook)
 
-        # # TODO docStatus 47 should mark
-        # # write output file
+        # write output file
         tempNameData = datetime.date.today().strftime('%d-%m-%Y')
         fileNameData = "~/desktop/" + tempNameData + "_Workload.xlsx"
         writer = pd.ExcelWriter(fileNameData, engine='xlsxwriter', datetime_format='dd.mm.yyyy')
