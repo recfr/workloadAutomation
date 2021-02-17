@@ -32,9 +32,9 @@ class Headers:
         sheetName.insert(0, self.tempRMLS, daysDiff_RMLS.dt.days)
 
     def cleanByDate(self, sheetName):
-        dayName = datetime.date.today().strftime('%A')
+        self.dayName = datetime.date.today().strftime('%A')
 
-        if dayName == 'Monday' or dayName == 'Tuesday':
+        if self.dayName == 'Monday' or self.dayName == 'Tuesday':
             for row in sheetName[self.tempRMLS]:
                 if row != None and row > 3:
                     rowIndex = next(iter(sheetName[sheetName[self.tempRMLS] == row].index), 'no match')
@@ -44,7 +44,7 @@ class Headers:
                     rowIndex = next(iter(sheetName[sheetName[self.tempTermin] == row].index), 'no match')
                     sheetName.drop(rowIndex, inplace=True)
 
-        elif dayName == 'Wednesday' or dayName == 'Thursday' or dayName == 'Friday':
+        elif self.dayName == 'Wednesday' or self.dayName == 'Thursday' or self.dayName == 'Friday':
             for row in sheetName[self.tempRMLS]:
                 if row != None and row > 4:
                     rowIndex = next(iter(sheetName[sheetName[self.tempRMLS] == row].index), 'no match')
@@ -118,12 +118,24 @@ class Headers:
         sheetName[self.pivotTableItem2] = sheetName['combinedDays']
         del sheetName['combinedDays']
 
+    def daySwitch(self, argument):
+        self.switcher = {
+            'Monday': "Pazartesi",
+            'Tuesday': "Salı",
+            'Wednesday': "Çarşamba",
+            'Thursday': "Perşembe",
+            'Friday': "Cuma",
+            'Saturday': "Cumartesi",
+            'Sunday': "Pazar"
+        }
+        return self.switcher.get(argument, "Invalid month")
+
     def rowMark_Fehler(self, sheetName):
         for row in sheetName[self.docType]:
             if len(row) > 12 and row[:2] == 'ME':
                 rowIndex = next(iter(sheetName[sheetName[self.docType] == row].index), 'no match')
-                sheetName.loc[rowIndex, self.pivotTableItem1] = 'Bugün Çalışılacak'
-                sheetName.loc[rowIndex, self.pivotTableItem2] = 'Bugün Çalışılacak'
+                sheetName.loc[rowIndex, self.pivotTableItem1] = f'{self.daySwitch(self.dayName)} Çalışılacak'
+                sheetName.loc[rowIndex, self.pivotTableItem2] = f'{self.daySwitch(self.dayName)} Çalışılacak'
                 sheetName.loc[rowIndex, self.pivotTableItem3] = 'Fehler'
 
     def splitStatus(self, sheetName):
