@@ -2,9 +2,9 @@
  This is an excel automation program developed for private use. 
 ###### How to use ?
 
--Name of input excel file is not important you just need to set the name of worksheet **Sheet1**
+- Name of input excel file is not important you just need to set the name of worksheet **Sheet1**
 
--Columns' order must be as follows.
+- Columns' order must be as follows.
 1. SollRückmeldetermin Leitstand
 2. Konstruktionstermin Soll
 3. Dokument
