@@ -63,7 +63,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MBT Workload Automation v1.0"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "MBT Workload Automation v1.1"))
         self.label.setText(_translate("MainWindow", "File Path"))
         self.cancelButton.setText(_translate("MainWindow", "Cancel"))
         self.executeButton.setText(_translate("MainWindow", "Execute"))
@@ -131,6 +131,9 @@ class Ui_MainWindow(object):
         pSeries1 = pd.Series(correctHeaderSet)
         pSeries2 = pd.Series(workBook.columns.values)
         isTrue = pSeries1.equals(other=pSeries2)
+
+        # TODO :update: init text Worksheet name must be 'Sheet1'
+
 
         if isTrue:
             self.headersObject.addPivotTableHeaders(workBook)

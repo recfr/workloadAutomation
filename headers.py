@@ -36,11 +36,11 @@ class Headers:
 
         if self.dayName == 'Monday' or self.dayName == 'Tuesday':
             for row in sheetName[self.tempRMLS]:
-                if row != None and row > 3:
+                if row != None and row > 4:
                     rowIndex = next(iter(sheetName[sheetName[self.tempRMLS] == row].index), 'no match')
                     sheetName.drop(rowIndex, inplace=True)
             for row in sheetName[self.tempTermin]:
-                if row != None and row > 3:
+                if row != None and row > 4:
                     rowIndex = next(iter(sheetName[sheetName[self.tempTermin] == row].index), 'no match')
                     sheetName.drop(rowIndex, inplace=True)
 
@@ -54,8 +54,6 @@ class Headers:
                     rowIndex = next(iter(sheetName[sheetName[self.tempTermin] == row].index), 'no match')
                     sheetName.drop(rowIndex, inplace=True)
 
-        del sheetName[self.tempRMLS]
-        del sheetName[self.tempTermin]
 
     def rowCleaner_KEM(self, sheetName):
         for row in sheetName[self.docType]:
