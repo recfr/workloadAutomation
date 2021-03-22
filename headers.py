@@ -1,6 +1,7 @@
 from datetime import datetime
 import datetime
 
+
 class Headers:
 
     def __init__(self):
@@ -55,8 +56,6 @@ class Headers:
                     sheetName.drop(rowIndex, inplace=True)
         del sheetName[self.tempRMLS]
         del sheetName[self.tempTermin]
-
-
 
     def rowCleaner_KEM(self, sheetName):
         for row in sheetName[self.docType]:
