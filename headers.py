@@ -9,7 +9,6 @@ class Headers:
         self.tempTermin = 'daysDiff_Termin'
         self.combinedColumns = 'Document Status'  # Combined docStatus & orderPhase
 
-        # define headers
         self.rmls = 'SollRückmeldetermin Leitstand'  # dd.mm.YYYY
         self.kTermin = 'Konstruktionstermin Soll'  # dd.mm.YYYY
         self.docType = 'Dokument'  # clean WAR,EBS & write HKB, GEN, GEL ; SU_?, CO_?

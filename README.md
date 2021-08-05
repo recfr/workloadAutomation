@@ -16,10 +16,19 @@
 9. KSW-Status
 10. Dokumentennummer Maßnahme
 11. Sachbearbeiter
+
+- Click to "**Execute**" button to create an edited excel workbook.
+- Then "**Create an E-Mail**" button will be clickable to create a new E-mail.
+
+###### Information
+employees.txt   : This file should contain your reciever list.
+carboncopy.txt  : This file should contain your CC (CarbonCopy) list.
+
 ## Libs 
 - [Pandas](https://pandas.pydata.org/)
 - [PyQt5](https://pypi.org/project/PyQt5/)
 - [Datetime](https://docs.python.org/3/library/datetime.html)
 - [xlsxwriter](https://xlsxwriter.readthedocs.io/)
+- [pyOutlook](https://pypi.org/project/pyOutlook/)
 
 
