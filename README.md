@@ -21,8 +21,8 @@
 - Then "**Create an E-Mail**" button will be clickable to create a new E-mail.
 
 ###### Information
-employees.txt   : This file should contain your reciever list.
-carboncopy.txt  : This file should contain your CC (CarbonCopy) list.
+- employees.txt   : This file should contain your reciever list.
+- carboncopy.txt  : This file should contain your CC (CarbonCopy) list.
 
 ## Libs 
 - [Pandas](https://pandas.pydata.org/)
