@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QFileDialog, QMessageBox
 from datetime import datetime
 import datetime
 import headers
+import outlook
 import xlrd
 import openpyxl
 import xlsxwriter
@@ -13,6 +14,7 @@ class Ui_MainWindow(object):
 
     def __init__(self):
         self.headersObject = headers.Headers()
+        self.outlook = outlook.EmailSender()
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -39,6 +41,11 @@ class Ui_MainWindow(object):
         self.executeButton.setObjectName("executeButton")
         self.executeButton.setEnabled(False)
 
+        self.attachEmailButton = QtWidgets.QPushButton(self.centralwidget)
+        self.attachEmailButton.setGeometry(QtCore.QRect(140, 50, 95, 23))
+        self.attachEmailButton.setObjectName("attachEmailButton")
+        self.attachEmailButton.setEnabled(False)
+
         self.browseButton = QtWidgets.QPushButton(self.centralwidget)
         self.browseButton.setGeometry(QtCore.QRect(320, 8, 75, 21))
         self.browseButton.setObjectName("browseButton")
@@ -63,17 +70,19 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MBT Workload Automation v1.1"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "MBT Workload Automation v2.0"))
         self.label.setText(_translate("MainWindow", "File Path"))
         self.cancelButton.setText(_translate("MainWindow", "Cancel"))
         self.executeButton.setText(_translate("MainWindow", "Execute"))
         self.browseButton.setText(_translate("MainWindow", "Browse"))
         self.actionAbout.setText(_translate("MainWindow", "About"))
+        self.attachEmailButton.setText(_translate("MainWindow", "Create to E-mail"))
 
     def initUI(self):
         self.cancelButton.clicked.connect(self.cancelButton_handler)
         self.browseButton.clicked.connect(self.browseButton_handler)
         self.executeButton.clicked.connect(self.executeButton_handler)
+        self.attachEmailButton.clicked.connect(self.attachToEmail_handler)
 
     def cancelButton_handler(self):
         sys.exit(app.exec_())
@@ -83,6 +92,9 @@ class Ui_MainWindow(object):
 
     def executeButton_handler(self):
         self.executeExcel()
+
+    def attachToEmail_handler(self):
+        self.attachEmail()
 
     def openDialogBox(self):
         path = "C:\\"
@@ -98,6 +110,7 @@ class Ui_MainWindow(object):
         msg.setText(f'Workload list created. \n{created_fileName}')
         msg.setIcon(QMessageBox.Information)
         self.executeButton.setEnabled(False)
+        self.attachEmailButton.setEnabled(True)
         x = msg.exec_()
 
     def warn_popUp(self):
@@ -121,9 +134,9 @@ class Ui_MainWindow(object):
 
     def executeExcel(self):
         correctHeaderSet = ['SollRückmeldetermin Leitstand', 'Konstruktionstermin Soll', 'Dokument',
-                                 'Beschreibung', 'BB-Nummer', 'Dokumentstatus', 'Auftragsphase',
-                                 'BB Beschreibung', 'KSW-Status', 'Dokumentennummer Maßnahme',
-                                 'Sachbearbeiter']
+                            'Beschreibung', 'BB-Nummer', 'Dokumentstatus', 'Auftragsphase',
+                            'BB Beschreibung', 'KSW-Status', 'Dokumentennummer Maßnahme',
+                            'Sachbearbeiter']
 
         dailyWorkload: str = self.path[0]
         workBook = pd.read_excel(dailyWorkload, sheet_name='Sheet1')
@@ -133,7 +146,6 @@ class Ui_MainWindow(object):
         isTrue = pSeries1.equals(other=pSeries2)
 
         # TODO :update: init text Worksheet name must be 'Sheet1'
-
 
         if isTrue:
             self.headersObject.addPivotTableHeaders(workBook)
@@ -149,17 +161,25 @@ class Ui_MainWindow(object):
             self.headersObject.workingDays(workBook)
             self.headersObject.rowMark_Fehler(workBook)
             self.headersObject.splitStatus(workBook)
+            self.headersObject.isOpenScope(workBook)
             self.headersObject.rowMark_Status47(workBook)
+            pivot = self.headersObject.create_PivotTable(workBook)
 
             # write output file
-            tempNameData = datetime.date.today().strftime('%d-%m-%Y')
-            fileNameData = "~/desktop/" + tempNameData + "_Workload.xlsx"
+            self.tempNameData = datetime.date.today().strftime('%d-%m-%Y')
+            fileNameData = "~/desktop/" + self.tempNameData + "_Workload.xlsx"
             writer = pd.ExcelWriter(fileNameData, engine='xlsxwriter', datetime_format='dd.mm.yyyy')
             workBook.to_excel(writer, 'Sheet1', index=False)
+            pivot.to_excel(writer, 'Pivot Table', index=True)
             writer.save()
             self.show_popUp(fileNameData[1:])
         else:
             self.warn_popUp()
+
+    def attachEmail(self):
+        workBook_path = self.tempNameData + "_Workload.xlsx"
+        self.outlook.createNewMail(workBook_path)
+        self.attachEmailButton.setEnabled(False)
 
 
 if __name__ == "__main__":
