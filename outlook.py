@@ -11,7 +11,6 @@ class EmailSender:
         self.employeeList = Path('employees.txt').read_text().replace('\n', '; ')
         self.carbonCopyList = Path('carboncopy.txt').read_text()
 
-
     def createNewMail(self, workBook_path):
         calendar_week = datetime.date.today().isocalendar()[1]
         outlook = client.Dispatch('outlook.application')

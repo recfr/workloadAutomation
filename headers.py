@@ -12,7 +12,6 @@ class Headers:
         self.combinedColumns = 'Document Status'  # Combined docStatus & orderPhase
         self.combinedDates = 'combi-date'
 
-        # define headers
         self.rmls = 'SollRückmeldetermin Leitstand'  # dd.mm.YYYY
         self.kTermin = 'Konstruktionstermin Soll'  # dd.mm.YYYY
         self.docType = 'Dokument'  # clean WAR,EBS & write HKB, GEN, GEL ; SU_?, CO_?
