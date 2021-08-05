@@ -76,7 +76,7 @@ class Ui_MainWindow(object):
         self.executeButton.setText(_translate("MainWindow", "Execute"))
         self.browseButton.setText(_translate("MainWindow", "Browse"))
         self.actionAbout.setText(_translate("MainWindow", "About"))
-        self.attachEmailButton.setText(_translate("MainWindow", "Create to E-mail"))
+        self.attachEmailButton.setText(_translate("MainWindow", "Create an E-mail"))
 
     def initUI(self):
         self.cancelButton.clicked.connect(self.cancelButton_handler)
